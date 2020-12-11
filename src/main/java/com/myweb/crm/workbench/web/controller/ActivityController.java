@@ -4,6 +4,7 @@ import com.myweb.crm.settings.domain.User;
 import com.myweb.crm.settings.service.UserService;
 import com.myweb.crm.settings.service.impl.UserServiceImpl;
 import com.myweb.crm.utils.*;
+import com.myweb.crm.vo.PaginationVO;
 import com.myweb.crm.workbench.domain.Activity;
 import com.myweb.crm.workbench.service.ActivityService;
 import com.myweb.crm.workbench.service.impl.ActivityServiceImpl;
@@ -28,9 +29,38 @@ public class ActivityController extends HttpServlet {
             getUserList(req,resp);
         } else if ("/workbench/activity/save.do".equals(path)){
             save(req,resp);
+        } else if ("/workbench/activity/pageList.do".equals(path)){
+            pageList(req,resp);
         } else {
             System.out.println("sb");
         }
+    }
+
+    private void pageList(HttpServletRequest req, HttpServletResponse resp) {
+        System.out.println("进入到市场活动查询列表操作");
+
+        String pageNoStr = req.getParameter("pageNo");
+        int pageNo = Integer.parseInt(pageNoStr);
+        String pageSizeStr = req.getParameter("pageSize");
+        int pageSize = Integer.parseInt(pageSizeStr);
+        String name = req.getParameter("name");
+        String owner = req.getParameter("owner");
+        String startDate = req.getParameter("startDate");
+        String endDate = req.getParameter("endDate");
+        int skipCount = (pageNo-1)*pageSize;
+
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("name",name);
+        map.put("owner",owner);
+        map.put("startDate",startDate);
+        map.put("endDate",endDate);
+        map.put("skipCount",skipCount);
+        map.put("pageSize",pageSize);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        PaginationVO<Activity> vo = as.pageList(map);
+        PrintJson.printJsonObj(resp,vo);
     }
 
     private void save(HttpServletRequest req, HttpServletResponse resp) {

@@ -5,6 +5,63 @@
 
 <mapper namespace="com.myweb.crm.workbench.dao.ActivityDao">
 
+    <select id="getTotalByCondition" resultType="int">
+
+        select count(*)
+        from tbl_activity a
+        join tbl_user u
+        on a.owner = u.id
+
+        <where>
+            <if test="name!= null and name != ''">
+                a.name like '%' #{name} '%'
+            </if>
+            <if test="owner!= null and owner != ''">
+                and a.name like '%' #{owner} '%'
+            </if>
+            <if test="startDate!= null and startDate != ''">
+                and a.startDate &gt; #{name}
+            </if>
+            <if test="endDate!= null and endDate != ''">
+                and a.endDate &lt; #{name}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getActivityListByCondition" resultType="Activity">
+        select
+        a.id,
+        a.name,
+        u.name as owner,
+        a.startDate,
+        a.endDate
+
+        from tbl_activity a
+        join tbl_user u
+        on a.owner = u.id
+
+        <where>
+            <if test="name!= null and name != ''">
+                a.name like '%' #{name} '%'
+            </if>
+            <if test="owner!= null and owner != ''">
+                and a.name like '%' #{owner} '%'
+            </if>
+            <if test="startDate!= null and startDate != ''">
+                and a.startDate &gt; #{name}
+            </if>
+            <if test="endDate!= null and endDate != ''">
+                and a.endDate &lt; #{name}
+            </if>
+        </where>
+
+        order by a.createTime desc
+
+        limit #{skipCount},#{pageSize}
+
+    </select>
+
     <insert id="save">
         insert into tbl_activity(
         id,
