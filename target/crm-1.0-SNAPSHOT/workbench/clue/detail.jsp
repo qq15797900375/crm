@@ -51,7 +51,71 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 		$(".myHref").mouseout(function(){
 			$(this).children("span").css("color","#E6E6E6");
 		});
+
+		getActivityList();
+
 	});
+
+	function getActivityList() {
+
+		$.ajax({
+			url:"workbench/clue/getActivityListByClueId.do",
+			data:{
+				"ClueId" : "${clue.id}"
+			},
+			type:"get",
+			dataType:"json",
+			success:function (data) {
+
+				var html = "";
+
+				$.each(data,function (i,n) {
+
+					html +=  '<tr>'
+					html +=  '<td>'+ n.name +'</td>'
+					html +=  '<td>'+ n.startDate +'</td>'
+					html +=  '<td>'+ n.endDate +'</td>'
+					html +=  '<td>'+ n.owner +'</td>'
+					html +=  '<td><a href="javascript:void(0);"  onclick="unbund(\''+ n.id +'\')" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>'
+					html +=  '</tr>'
+
+				})
+
+				$("#activityBody").html(html);
+
+			}
+		})
+
+	}
+
+	/*
+
+	id:关联关系表的id
+	*/
+
+	function unbund(id) {
+
+		$.ajax({
+			url:"workbench/clue/unbund.do",
+			data:{
+				"id" : id
+			},
+			type:"post",
+			dataType:"json",
+			success:function (data) {
+
+				if (data.success){
+
+					getActivityList();
+
+				} else {
+					alert("解除关联失败");
+				}
+
+			}
+		})
+
+	}
 	
 </script>
 
@@ -435,8 +499,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="activityBody">
+						<%--<tr>
 							<td>发传单</td>
 							<td>2020-10-10</td>
 							<td>2020-10-20</td>
@@ -449,7 +513,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 							<td>2020-10-20</td>
 							<td>zhangsan</td>
 							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-						</tr>
+						</tr>--%>
 					</tbody>
 				</table>
 			</div>

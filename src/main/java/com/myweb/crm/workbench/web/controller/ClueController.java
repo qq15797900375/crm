@@ -7,14 +7,18 @@ import com.myweb.crm.utils.DateTimeUtil;
 import com.myweb.crm.utils.PrintJson;
 import com.myweb.crm.utils.ServiceFactory;
 import com.myweb.crm.utils.UUIDUtil;
+import com.myweb.crm.workbench.domain.Activity;
 import com.myweb.crm.workbench.domain.Clue;
+import com.myweb.crm.workbench.service.ActivityService;
 import com.myweb.crm.workbench.service.ClueService;
+import com.myweb.crm.workbench.service.impl.ActivityServiceImpl;
 import com.myweb.crm.workbench.service.impl.ClueServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.Service;
 import java.io.IOException;
 import java.util.List;
 
@@ -31,9 +35,40 @@ public class ClueController extends HttpServlet {
             save(req,resp);
         } else if ("/workbench/clue/detail.do".equals(path)){
             detail(req,resp);
+        } else if ("/workbench/clue/getActivityListByClueId.do".equals(path)){
+            getActivityListByClueId(req,resp);
+        } else if ("/workbench/clue/unbund.do".equals(path)){
+            unbund(req,resp);
         } else {
             System.out.println("sb");
         }
+    }
+
+    private void unbund(HttpServletRequest req, HttpServletResponse resp) {
+
+        System.out.println("执行解除关联操作");
+
+        String id = req.getParameter("id");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        boolean flag = cs.unbund(id);
+
+        PrintJson.printJsonFlag(resp,flag);
+    }
+
+    private void getActivityListByClueId(HttpServletRequest req, HttpServletResponse resp) {
+
+        System.out.println("根据线索id查询关联的市场活动列表");
+
+        String ClueId = req.getParameter("ClueId");
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        List<Activity> activityList = as.getActivityListByClueId(ClueId);
+
+        PrintJson.printJsonObj(resp,activityList);
+
     }
 
     private void detail(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -49,7 +49,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 			})
 
 			$("#create-owner").val("${user.id}");
-
 			$("#createActivityModal").modal("show");
 
 
