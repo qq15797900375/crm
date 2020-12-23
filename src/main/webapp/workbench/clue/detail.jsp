@@ -54,6 +54,119 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 
 		getActivityList();
 
+		//为关联市场活动模态窗口中的 搜索框 绑定事件，通过回车键，查询并展现所需市场活动信息列表
+		$("#aname").keydown(function (event) {
+
+			if (event.keyCode == 13){
+
+				$.ajax({
+					url:"workbench/clue/getActivityListByNameAndNotByClueId.do",
+					data:{
+						"aname" : $.trim($("#aname").val()),
+						"clueId" : "${clue.id}"
+					},
+					type:"get",
+					dataType:"json",
+					success:function (data) {
+
+						var html = "";
+
+						$.each(data,function (i,n) {
+
+							html += '<tr>'
+							html += '<td><input type="checkbox" name="xz" value="'+ n.id +'"/></td>'
+							html += '<td>'+ n.name +'</td>'
+							html += '<td>'+ n.startDate +'</td>'
+							html += '<td>'+ n.endDate +'</td>'
+							html += '<td>'+ n.owner +'</td>'
+							html += '</tr>'
+
+						})
+
+						$("#activitySearchBody").html(html);
+
+						//为全选的复选框绑定事件,触发全选操作
+						$("#qx").click(function () {
+							$("input[name = xz]").prop("checked",this.checked);
+						})
+
+						//这样是不行的
+						//因为动态生成的元素，是不能绑定普通事件的形式来操作的
+						// $("input[name = xz]").click(function () {
+						// 	alert("123");
+						// })
+						//动态生成的元素，要以on方式的形式来触发事件
+						//语法：$(需要绑定元素的有效外层元素).on(绑定事件的方式，需要绑定的元素的jquery对象，回调函数)
+						$("#activitySearchBody").on("click",$("input[name = xz]"),function () {
+							$("#qx").prop("checked",$("input[name=xz]").length==$("input[name=xz]:checked").length);
+						})
+
+					}
+				})
+
+				//展现完列表后，将模态窗口默认的回车行为禁用
+				return false;
+
+			}
+
+			$("#bundBtn").click(function () {
+
+				var $xz = $("input[name=xz]:checked");
+
+				if ($xz.length == 0){
+
+					alert("请选择需要关联的市场活动");
+
+				} else {
+
+					var param = "cid=${clue.id}&";
+
+					for (var i = 0; i < $xz.length; i++) {
+
+						param += "aid="+$($xz[i]).val();
+
+						if (i < $xz.length-1){
+
+							param += "&";
+
+						}
+
+					}
+
+					$.ajax({
+						url:"workbench/clue/bund.do",
+						data: param,
+						type:"post",
+						dataType:"json",
+						success:function (data) {
+
+							if (data.success){
+
+								//刷新关联市场活动的列表
+								getActivityList();
+
+								//清除搜索框中的信息 清除复选框的勾 清除activitySearchBody中的内容
+								$("#aname").val("");
+								$("#activitySearchBody").html("");
+								$("#qx").prop("checked",false);
+
+								$("#bundModal").modal("hide");
+
+							} else {
+								alert("关联市场活动失败");
+							}
+
+						}
+					})
+
+
+				}
+
+			})
+
+	})
+
+
 	});
 
 	function getActivityList() {
@@ -136,7 +249,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 					<div class="btn-group" style="position: relative; top: 18%; left: 8px;">
 						<form class="form-inline" role="form">
 						  <div class="form-group has-feedback">
-						    <input type="text" class="form-control" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
+						    <input type="text" class="form-control" id="aname" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
 						    <span class="glyphicon glyphicon-search form-control-feedback"></span>
 						  </div>
 						</form>
@@ -144,7 +257,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 					<table id="activityTable" class="table table-hover" style="width: 900px; position: relative;top: 10px;">
 						<thead>
 							<tr style="color: #B3B3B3;">
-								<td><input type="checkbox"/></td>
+								<td><input type="checkbox" id="qx"/></td>
 								<td>名称</td>
 								<td>开始日期</td>
 								<td>结束日期</td>
@@ -152,8 +265,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 								<td></td>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
+						<tbody id="activitySearchBody">
+							<%--<tr>
 								<td><input type="checkbox"/></td>
 								<td>发传单</td>
 								<td>2020-10-10</td>
@@ -166,13 +279,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 								<td>2020-10-10</td>
 								<td>2020-10-20</td>
 								<td>zhangsan</td>
-							</tr>
+							</tr>--%>
 						</tbody>
 					</table>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">关联</button>
+					<button type="button" class="btn btn-primary" id="bundBtn">关联</button>
 				</div>
 			</div>
 		</div>
@@ -345,7 +458,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+ request
 			<h3>${clue.fullname}${clue.appellation} <small>${clue.company}</small></h3>
 		</div>
 		<div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
-			<button type="button" class="btn btn-default" onclick="window.location.href='workbench/clue/convert.jsp';"><span class="glyphicon glyphicon-retweet"></span> 转换</button>
+			<button type="button" class="btn btn-default" onclick="window.location.href='workbench/clue/convert.jsp?id=${clue.id}&fullname=${clue.fullname}&appellation=${clue.appellation}&company=${clue.company}&owner=${clue.owner}';"><span class="glyphicon glyphicon-retweet"></span> 转换</button>
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#editClueModal"><span class="glyphicon glyphicon-edit"></span> 编辑</button>
 			<button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 		</div>

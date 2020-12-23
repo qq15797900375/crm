@@ -8,9 +8,8 @@ import com.myweb.crm.utils.ServiceFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.security.Key;
+import java.util.*;
 
 public class SysInitListener implements ServletContextListener {
 
@@ -31,6 +30,21 @@ public class SysInitListener implements ServletContextListener {
         }
 
         System.out.println("服务器缓存处理数据字典结束");
+
+        //处理StageToPossibility.properties文件
+        Map<String,String> StageToPossibilityMap = new HashMap<String, String>();
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("StageToPossibility");
+        Enumeration<String> stringEnumeration = resourceBundle.getKeys();
+
+        while (stringEnumeration.hasMoreElements()){
+
+            String key = stringEnumeration.nextElement();
+            String value = resourceBundle.getString(key);
+            StageToPossibilityMap.put(key,value);
+
+        }
+
+        application.setAttribute("StageToPossibilityMap",StageToPossibilityMap);
 
     }
 }

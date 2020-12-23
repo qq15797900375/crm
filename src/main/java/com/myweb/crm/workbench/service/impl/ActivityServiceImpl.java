@@ -20,6 +20,19 @@ public class ActivityServiceImpl implements ActivityService {
     private ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
     private UserDao userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
 
+    public List<Activity> getActivityListByName(String aname) {
+
+        List<Activity> activityList = activityDao.getActivityListByName(aname);
+        return activityList;
+    }
+
+    public List<Activity> getActivityListByNameAndNotByClueId(Map<String, String> map) {
+
+        List<Activity> activityList = activityDao.getActivityListByNameAndNotByClueId(map);
+
+        return activityList;
+    }
+
     public List<Activity> getActivityListByClueId(String clueId) {
 
         List<Activity> activityList = activityDao.getActivityListByClueId(clueId);

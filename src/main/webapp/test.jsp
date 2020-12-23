@@ -35,5 +35,8 @@
     todayBtn: true,
     pickerPosition: "bottom-left"
     });
+
+    String createTime = DateTimeUtil.getSysTime();
+    String createBy = ((User)req.getSession().getAttribute("user")).getName();
 </body>
 </html>

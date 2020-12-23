@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ActivityController extends HttpServlet {
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("进入到市场活动控制器");
