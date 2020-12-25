@@ -32,7 +32,7 @@ public class SysInitListener implements ServletContextListener {
         System.out.println("服务器缓存处理数据字典结束");
 
         //处理StageToPossibility.properties文件
-        Map<String,String> StageToPossibilityMap = new HashMap<String, String>();
+        Map<String,String> stageToPossibilityMap = new HashMap<String, String>();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("StageToPossibility");
         Enumeration<String> stringEnumeration = resourceBundle.getKeys();
 
@@ -40,11 +40,11 @@ public class SysInitListener implements ServletContextListener {
 
             String key = stringEnumeration.nextElement();
             String value = resourceBundle.getString(key);
-            StageToPossibilityMap.put(key,value);
+            stageToPossibilityMap.put(key,value);
 
         }
 
-        application.setAttribute("StageToPossibilityMap",StageToPossibilityMap);
+        application.setAttribute("stageToPossibilityMap",stageToPossibilityMap);
 
     }
 }

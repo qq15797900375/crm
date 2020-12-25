@@ -40,7 +40,7 @@ public class UserController extends HttpServlet {
         UserService us= (UserService) ServiceFactory.getService(new UserServiceImpl());
 
         try{
-            System.out.println("sb");
+
             User user =  us.login(loginAct,loginPwd,ip);
 
             req.getSession().setAttribute("user",user);
